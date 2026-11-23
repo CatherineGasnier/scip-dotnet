@@ -364,6 +364,10 @@ public class SnapshotTests
                     break;
                 var isDefinition = (occurrence.SymbolRoles & (int)SymbolRole.Definition) != 0;
                 var role = isDefinition ? "definition" : "reference";
+                if ((occurrence.SymbolRoles & (int)SymbolRole.Test) != 0)
+                {
+                    role = "test " + role;
+                }
                 var length = range.End.Character - range.Start.Character;
                 var indent = new String(' ', range.Start.Character);
                 if (document.Language == "Visual Basic")

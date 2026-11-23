@@ -53,6 +53,18 @@ If you already have `scip-dotnet` installed you will get an error message saying
 "Tool 'scip-dotnet' is already installed.". To fix this problem, run the command
 `dotnet tool update --global scip-dotnet` to update to the latest version.
 
+## Test code
+
+`scip-dotnet` gives every occurrence in test code the SCIP `SymbolRole.Test`
+role, so that tools can tell test code apart from production code.
+
+A file is test code when every project that compiles it is a test project. A
+project is a test project when MSBuild sets its `IsTestProject` or
+`IsTestingPlatformApplication` property to `true`. These are the properties
+that `dotnet test` uses to find test projects. Test frameworks set them for
+you: for example, `Microsoft.NET.Test.Sdk` sets `IsTestProject`, while
+MSTest.Sdk, xunit.v3 and TUnit set `IsTestingPlatformApplication`.
+
 ## Contributing
 
 The section below is only relevant for contributors to this repository.

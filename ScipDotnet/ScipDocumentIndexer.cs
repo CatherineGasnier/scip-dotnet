@@ -27,6 +27,9 @@ public class ScipDocumentIndexer
     private readonly HashSet<string> _definedSymbols;
     private readonly string _markdownCodeFenceLanguage;
 
+    // When true, every occurrence in this document gets SymbolRole.Test.
+    private readonly bool _isTestCode;
+
     // Custom formatting options to render symbol documentation. Feel free to tweak these parameters.
     // The options were derived by multiple rounds of experimentation with the goal of striking a
     // balance between showing detailed/accurate information without using too verbose syntax.
@@ -71,7 +74,8 @@ public class ScipDocumentIndexer
         IndexCommandOptions options,
         Dictionary<ISymbol, ScipSymbol> globals,
         Dictionary<string, SymbolInformation> externalSymbols,
-        HashSet<string> definedSymbols)
+        HashSet<string> definedSymbols,
+        bool isTestCode)
     {
         _doc = doc;
         _options = options;
@@ -79,6 +83,7 @@ public class ScipDocumentIndexer
         _externalSymbols = externalSymbols;
         _definedSymbols = definedSymbols;
         _markdownCodeFenceLanguage = _doc.Language == "C#" ? "cs" : "vb";
+        _isTestCode = isTestCode;
     }
 
     private ScipSymbol CreateScipSymbol(ISymbol? sym)
@@ -264,6 +269,11 @@ public class ScipDocumentIndexer
         if (isDefinition)
         {
             symbolRole |= (int)SymbolRole.Definition;
+        }
+
+        if (_isTestCode)
+        {
+            symbolRole |= (int)SymbolRole.Test;
         }
 
         var scip = CreateScipSymbol(symbol);

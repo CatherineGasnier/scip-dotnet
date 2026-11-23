@@ -14,6 +14,12 @@
       "groupName": "NUnit test dependencies",
       "matchManagers": ["nuget"],
       "matchPackageNames": ["NUnit", "NUnit.Analyzers", "NUnit3TestAdapter"]
+    },
+    {
+      "description": "Microsoft.Build 17.12 and later drop net8.0, which this tool still targets. The reference is compile-time only.",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["Microsoft.Build"],
+      "allowedVersions": "<17.12.0"
     }
   ]
 }
