@@ -11,10 +11,14 @@ namespace ScipDotnet;
 /// </summary>
 public class ScipProjectIndexer
 {
-    public ScipProjectIndexer(ILogger<ScipProjectIndexer> logger) =>
+    public ScipProjectIndexer(ILogger<ScipProjectIndexer> logger, TestProjectClassifier testProjects)
+    {
         Logger = logger;
+        TestProjects = testProjects;
+    }
 
     private ILogger<ScipProjectIndexer> Logger { get; }
+    private TestProjectClassifier TestProjects { get; }
 
     // Index-wide collections populated while documents are indexed. After indexing
     // finishes, the caller copies ExternalSymbols (minus DefinedSymbols) into
@@ -162,7 +166,8 @@ public class ScipProjectIndexer
         }
         else
         {
-            var symbolFormatter = new ScipDocumentIndexer(doc, options, globals, ExternalSymbols, DefinedSymbols);
+            var symbolFormatter = new ScipDocumentIndexer(doc, options, globals, ExternalSymbols, DefinedSymbols,
+                IsTestCode(document));
             var root = await document.GetSyntaxRootAsync();
             if (language == "C#")
             {
@@ -177,5 +182,19 @@ public class ScipProjectIndexer
         }
 
         return doc;
+    }
+
+    /// <summary>
+    /// A file is test code when every project that compiles it is a test project.
+    /// Roslyn calls the copies of the same file in other projects its linked documents.
+    /// For example, a library source file that is also linked into a test project stays library code.
+    /// </summary>
+    private bool IsTestCode(Document document)
+    {
+        var solution = document.Project.Solution;
+        return document.GetLinkedDocumentIds()
+            .Select(id => solution.GetProject(id.ProjectId)!)
+            .Append(document.Project)
+            .All(TestProjects.IsTestProject);
     }
 }

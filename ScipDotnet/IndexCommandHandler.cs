@@ -84,7 +84,8 @@ public static class IndexCommandHandler
     private static async Task ScipIndex(ILoggerFactory loggerFactory, MSBuildWorkspace workspace, IndexCommandOptions options)
     {
         var stopwatch = Stopwatch.StartNew();
-        var indexer = new ScipProjectIndexer(loggerFactory.CreateLogger<ScipProjectIndexer>());
+        var testProjects = new TestProjectClassifier(workspace, loggerFactory.CreateLogger<TestProjectClassifier>());
+        var indexer = new ScipProjectIndexer(loggerFactory.CreateLogger<ScipProjectIndexer>(), testProjects);
         var index = new Scip.Index
         {
             Metadata = new Metadata
